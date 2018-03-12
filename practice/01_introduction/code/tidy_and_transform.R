@@ -1,14 +1,16 @@
-
+# clean R environment
 rm(list = ls());gc()
-#linux
-#setwd('/home/frandiego/projects/ier/01_introduction/')
-#mac
-setwd("/wrk/ier/exercises/01_introduction/")
+# set working directory
+setwd('practice/01_introduction/')
+
+library(data.table)
 
 ########## IMPORT DATA
 df <- fread('data/movies.csv')
+
+########## TAKE TRAIN DATA
 train <- df[release_year!=2018]
-df$release_year %>% table
+train$release_year %>% table
 
 
 ########## TIDY DATA
@@ -31,19 +33,20 @@ variables_to_remove <- c(variables_to_remove,'adult')
 # remove some variables
 train[,c(unique(variables_to_remove)) := NULL]
 
-# the variable status is so unbalance because there is just one film (Wind River) 
-# that is not realeased yet. So we can remove the row or the column, but I think 
+# the variable status is so unbalance because there is just one film (Wind River)
+# that is not realeased yet. So we can remove the row or the column, but I think
 # this is a data-error so I prefer to remove the column.
 train[,prop.table(table(status))]
+train[status=='Planned',unique(title)]
 train[,status := NULL]
 
 ########## TRANSFORM DATA
 # There are some variables that do not provide information 'per se', for example
-# homepage but it couldb be a good to know if the film has a homepage or not, so 
+# homepage but it couldb be a good to know if the film has a homepage or not, so
 # the variable homepage can be transform into a boolean (True/False) variable
 
 ############ create variable number of genres
-# get a sample 
+# get a sample
 x <- head(train$genre_ids,10)
 print(x)
 # table and example
@@ -72,7 +75,7 @@ n_genres <- n_pipes + 1
 
 n_genres <- i %>% strsplit('') %>% unlist() %>% grepl('\\|',.) %>% sum %>% +1
 
-# but we can be smarter using regex 
+# but we can be smarter using regex
 n_pipes_l <- stringr::str_match_all(i,'\\|')
 n_pipes_l
 n_pipes_l <- map(n_pipes_l,nrow)
@@ -120,11 +123,11 @@ str_n_elements <- function(x,split){
   return(map_dbl(x,~nrow(str_match_all(.,split)[[1]])))
 }
 
-train[,spoken_languages_n := 
+train[,spoken_languages_n :=
         str_n_elements(spoken_languages,'\\|')+1]
 
 ############ number of production_countries
-train[,production_countries_n := 
+train[,production_countries_n :=
         str_n_elements(production_countries,'\\|')+1]
 
 
@@ -159,14 +162,14 @@ train[,c('budget_hist','budget_quant'):=
         invoke_map(list(historize,quantilize),x=budget)]
 ############ production country
 # we are going to explore this variable
-train[,production_countries] %>% 
-  map(~strsplit(.,'\\|')) %>% 
-  map(unlist) %>% 
-  unlist() %>% 
-  table() %>% 
-  sort() %>% 
+train[,production_countries] %>%
+  map(~strsplit(.,'\\|')) %>%
+  map(unlist) %>%
+  unlist() %>%
+  table() %>%
+  sort() %>%
   plot()
-# so we want to know is is from use, from gb, from fr, from ca, from de 
+# so we want to know is is from use, from gb, from fr, from ca, from de
 # from es or from in
 train[,production_us := grepl('US',production_countries)]
 train[,production_gb := grepl('GB',production_countries)]
@@ -176,7 +179,7 @@ train[,production_es := grepl('ES',production_countries)]
 train[,production_in := grepl('IN',production_countries)]
 
 ############ homepage
-# the homepage by itself give no information 
+# the homepage by itself give no information
 head(train$homepage,2)
 # but if the film has a homepage it may mean that this film have
 # online presence
@@ -187,8 +190,8 @@ train[,has_homepage := ifelse(homepage=='',0,1)]
 to_factor <- names(which(map_lgl(map_int(train,uniqueN),~.<=25)))
 train[,c(to_factor) := map(.SD,as.factor),.SDcols = c(to_factor)]
 
-### I have create a function called transform (transform_movies.R) to apply 
-### the same function to train and test 
+### I have create a function called transform (transform_movies.R) to apply
+### the same function to train and test
 
 
 

@@ -11,4 +11,5 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   tidyverse (>= 1.2.1),
-  data.table (>= 1.10.4)
+  data.table (>= 1.10.4),
+  xml2 (>= 1.2.0)
