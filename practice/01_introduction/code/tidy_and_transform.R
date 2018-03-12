@@ -4,7 +4,7 @@ rm(list = ls());gc()
 setwd('practice/01_introduction/')
 
 library(data.table)
-
+library(purrr)
 ########## IMPORT DATA
 df <- fread('data/movies.csv')
 
@@ -140,7 +140,7 @@ train$popularity %>% hist()
 historize <- function(x,breaks='Sturges'){
   hist_  <- hist(x,plot = F,breaks = breaks)
   mids_ <- hist_$mids
-  levels_ <- seq_along(h$breaks)
+  levels_ <- seq_along(hist_$breaks)
   ret_ <- map_int(x,~levels_[which.min(abs(.-mids_))])
   return(ret_)
 }
