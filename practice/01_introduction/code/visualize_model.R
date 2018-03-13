@@ -3,21 +3,21 @@ rm(list = ls());gc()
 # set working directory
 setwd('practice/01_introduction/')
 source('code/functions/transform_movies.R')
-library(ranger)
-library(ggplot2)
 
 ########## IMPORT DATA
 df <- fread('data/movies.csv')
 
-train <- df[!release_year%in%c(2018)]
+train <- df[!release_year%in%c(2018,2017)]
 ttrain <- transform_movies(train)[vote_count>0]
 
-test  <- df[release_year%in%c(2018)]
+test  <- df[release_year%in%c(2018,2017)]
 ttest <- transform_movies(test)[vote_count>0]
 
 ### VIZ 1
-ttrain[,c('vote_average','production_us','production_gb','production_fr',
-          'production_ca','production_es','production_in'),with=F] %>%
+y <- 'vote_average'
+production_country <- c('production_us','production_gb','production_fr',
+                        'production_ca','production_es','production_in')
+ttrain[,c(y,production_country),with=F] %>%
   melt(id.vars = 'vote_average') %>%
   .[,.(vote_average=mean(vote_average)),by=c('variable','value')] %>%
   setkeyv(.,c('variable','value')) %>%
@@ -32,8 +32,7 @@ ttrain[,c('vote_average','production_us','production_gb','production_fr',
         plot.title  = element_text(hjust = 0.5))
 
 
-# MODEL -------------------------------------------------------------------
-
+### VIZ 2
 y = 'vote_average'
 x = c(
   'vote_count',
@@ -43,7 +42,6 @@ x = c(
   'budget',
   'revenue',
   'runtime',
-  'status',
   'belongs_to_collection',
   'production_companies_number',
   'spoken_languages',
@@ -66,16 +64,50 @@ x = c(
   'has_homepage'
 )
 
+
+ttrain[,c(y,x),with=F] %>% map_lgl(~uniqueN(.)<20) %>% which() %>% names -> factors
+factors <- setdiff(factors,production_country)
+
+### VIZ 3
+ttrain[,c(factors,y),with=F] %>% melt(id.vars = y) %>%
+  .[,.(vote_average=mean(vote_average)),by=c('variable','value')] %>%
+  .[,vote_average := vote_average - mean(ttrain$vote_average)] %>%
+  .[,sign := sign(vote_average)] %>%
+  setkeyv(c('variable','value')) %>%
+  ggplot(aes(value,vote_average,fill=factor(sign))) +
+  geom_bar(stat='identity') +
+  facet_wrap(~variable,scales='free',ncol = 5) +
+  theme_minimal()+
+  theme(legend.position = 'none', plot.title = element_text(hjust = 0.5))+
+  labs(title='contribution to the average rating')
+
+### VIZ 4
+ttrain[,c(y,c('popularity','runtime','budget','revenue','vote_count')), with=F]%>%
+  melt(id.vars = y) %>%
+  ggplot(aes(value,vote_average)) +
+  facet_wrap(~variable,scales = 'free',ncol=1) +
+  geom_point(alpha=0.2)+
+  geom_smooth()+
+  ylim(c(4,NA))
+
+
+
 # remove vote_count_hist (we take vote_count)
 # same thing for vote_count_quant and popularity_quant
 # same reaseon for budget_quant
 
-
+formula <- as.formula(paste0(y,'~',paste0(x,collapse = '+')))
 rf <- ranger::ranger(formula,ttrain,importance = 'impurity')
 pr <- predict(rf,ttest)
 rf$variable.importance %>% sort(T)
-plot(pr$predictions[ttest$vote_count>=20],
-                    ttest[ttest$vote_count>=20]$vote_average)
 
-
+dt_res <- data.table(prediction = pr$predictions,
+                     actual = ttest$vote_average,
+                     vote_count = ttest$vote_count)
+ggplot(dplyr::filter(dt_res,vote_count>0),aes(prediction,actual,size=vote_count)) +
+  geom_point(alpha=0.7) +
+  geom_smooth()+
+  labs(title = 'performace')+
+  theme_minimal()+
+  theme(plot.title = element_text(hjust=0.5), legend.position = 'bottom')
 

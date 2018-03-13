@@ -17,31 +17,31 @@ quantilize <- function(x,n=4){
 }
 
 transform_movies <- function(df){
-  
+
   df[,c('genre_n','spoken_languages_n','production_countries_n'):=
-       map(.SD,~str_n_elements(x=.,split='\\|')), 
+       map(.SD,~str_n_elements(x=.,split='\\|')),
      .SDcols = c('genre_ids','spoken_languages','production_countries')]
-  
+
   df[,c('popularity_hist','vote_count_hist','budged_hist'):=
-       map(.SD,historize), 
+       map(.SD,historize),
      .SDcols = c('popularity','vote_count','budget')]
-  
+
   df[,c('popularity_quant','vote_count_quant','budged_quant'):=
-       map(.SD,quantilize), 
+       map(.SD,quantilize),
      .SDcols = c('popularity','vote_count','budget')]
-  
+
   df[,release_month := month(release_date)]
-  
+
   prod_countries <- c('US','GB','FR','CA','ES','IN')
   for(cnt in prod_countries){
     df[,paste0('production_',tolower(cnt)) := grepl(cnt,production_countries)]
   }
-  
+
   df[,has_homepage := ifelse(homepage=='',0,1)]
   # if runtime is na, replace with the mean
   df[is.na(runtime),runtime := mean(df$runtime,na.rm = T)]
-  
-  
+
+
   to_factor <-
     c(
       'video',
@@ -66,7 +66,8 @@ transform_movies <- function(df){
       'production_es',
       'production_in'
     )
-  
+
   df[,c(to_factor) := map(.SD,as.factor),.SDcols = c(to_factor)]
+
   return(df)
 }
