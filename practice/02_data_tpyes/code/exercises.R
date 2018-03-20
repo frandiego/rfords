@@ -8,11 +8,7 @@ v_int <- 1:10
 v_dbl <- as.double(v_int)
 v_chr <- c("double","quotes","are","preferred")
 
-##### factors
-# ordered factor
-f_mnt <- factor(c('Jan','Nov','Apr','Feb','May'),
-                ordered = T,
-                levels = month.abb)
+
 
 
 
