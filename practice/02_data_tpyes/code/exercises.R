@@ -2,7 +2,6 @@
 
 
 # MISE EN PALCE ---------------------------------------------------------------
-
 ##### vectors
 v_lgl <- c(T,F)
 v_int <- 1:10
@@ -14,6 +13,7 @@ v_chr <- c("double","quotes","are","preferred")
 f_mnt <- factor(c('Jan','Nov','Apr','Feb','May'),
                 ordered = T,
                 levels = month.abb)
+
 
 
 # EXERCISE 1 TYPE OF VECTORS ---------------------------------------------------
@@ -75,8 +75,19 @@ fct_week_days <- week_days_levels[week_days]
 names(fct_week_days)
 names(week_days_levels[sort(unique(fct_week_days))])
 
+#' 6. To check that we have done everything ok, create a factor using week_days
+#'    it must be an ordered vectors and use as labels the names of
+#'    week_days_levels. Assign this factor to the variable fct_week_days_real
+fct_week_days_real <- factor(week_days,
+                             ordered = T,
+                             levels = 1:7,
+                             labels = c('Mon','Tue','Wed',
+                                        'Thr','Fri','Sat','Sun'))
 
-
+#' 7. Finally chechk that the names of fct_week_days has the same elements
+#'    then fct_week_days_real coerced to be characters
+#'    we can use the function all to evaluate if all element in a vector are T
+all(as.character(fct_week_days_real) == names(fct_week_days))
 
 
 
