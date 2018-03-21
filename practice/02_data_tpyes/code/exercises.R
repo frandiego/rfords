@@ -9,9 +9,6 @@ v_dbl <- as.double(v_int)
 v_chr <- c("double","quotes","are","preferred")
 
 
-
-
-
 # EXERCISE 1 TYPE OF VECTORS ---------------------------------------------------
 # check the type of the vectors (variables starting with v_)
 typeof(v_lgl)
@@ -85,5 +82,60 @@ fct_week_days_real <- factor(week_days,
 #'    we can use the function all to evaluate if all element in a vector are T
 all(as.character(fct_week_days_real) == names(fct_week_days))
 
+
+
+# EXERCISE 4. BASIC MATRIX ALGEBRA ----------------------------------------------
+#' 1.  create a (3,3) matrix that cointains the first 9 integers (1:9) filling
+#'     data by columns, store this object in the variable max_x
+#'     create a (3,3) matrix with the first 9 integers filing data by rows and
+#'     store the object created in the varible max_y
+#'     Finally print both of them
+mat_x <- matrix(data=1:9, nrow = 3, ncol = 3, byrow = F)
+mat_y <- matrix(data=1:9, nrow = 3, ncol = 3, byrow = T)
+print(mat_x)
+print(mat_y)
+
+#' 2.  element-wise multiplication (mutiply the columns as if were scalars)
+#'     spend 10 seconds to examine how it has been calculated
+#'     store the resulted matrix in the variable mat_prod
+mat_x * mat_y
+mat_prod = mat_x * mat_y
+
+#' 3. matrix multiplication (use the %*% operator to multiply two columns)
+#'    spend 10 seconds to examine how it has been calculated
+#'    remember 1x1 + 4x4 + 7x7 = 66
+crossprod(mat_x,mat_y)
+sum(mat_x[1,] * mat_y[1,]) == crossprod(mat_x,mat_y)[1,1]
+sum(mat_x[1,] * mat_y[2,]) == crossprod(mat_x,mat_y)[2,1]
+sum(mat_x[2,] * mat_y[1,]) == crossprod(mat_x,mat_y)[1,2]
+
+#' 4. transpose one matrix and realise is the same than the other matrix
+#'    (hint use the function t())
+t(mat_y)
+t(mat_y) == mat_x
+all(t(mat_y)==mat_x)
+
+#' 5. create a vector with the components of the principal diagonal of mat_x
+#'    and realise that thi is equal to the components of the principal diagonal
+#'    of mat_y. (hint use the function diag). store this vector in the variable
+#'    diagonal
+diagonal <- diag(mat_x)
+all(diagonal == diag(mat_y))
+
+#' 6. calcule the determinant of mat_prod, mat_x, mat_y
+#'    when the determinant of a matrix is 0 it cannot be computed its inverse
+#'    matrix. do you think you can create the inverse matrix of mat_y?
+det(mat_x)
+det(mat_y)
+det(mat_prod)
+
+#' 7. try to calculate the inverse matrix of mat_x and mat_y
+#'    calculcate the inverse matrix of mat_prod and store it in mat_inv
+#'    and proof that this inverse matrix is well calculated.
+
+solve(mat_y)
+solve(mat_x)
+mat_inv <- solve(mat_prod)
+all(mat_inv * mat_prod == mat_prod * mat_inv)
 
 
