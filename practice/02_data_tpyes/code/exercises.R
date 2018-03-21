@@ -1,7 +1,10 @@
 
 
 
-# MISE EN PLACE ---------------------------------------------------------------
+# MISE EN PLACE ----------------------------------------------------------------
+##### libraries
+library(data.table)
+library(dplyr)
 ##### vectors
 v_lgl <- c(T,F)
 v_int <- 1:10
@@ -84,7 +87,7 @@ all(as.character(fct_week_days_real) == names(fct_week_days))
 
 
 
-# EXERCISE 4. BASIC MATRIX ALGEBRA ----------------------------------------------
+# EXERCISE 4. BASIC MATRIX ALGEBRA ---------------------------------------------
 #' 1.  create a (3,3) matrix that cointains the first 9 integers (1:9) filling
 #'     data by columns, store this object in the variable max_x
 #'     create a (3,3) matrix with the first 9 integers filing data by rows and
@@ -137,5 +140,69 @@ solve(mat_y)
 solve(mat_x)
 mat_inv <- solve(mat_prod)
 all(mat_inv * mat_prod == mat_prod * mat_inv)
+
+
+
+# EXERCISE 5. BASIC DATA.FRAME OPERATIONS --------------------------------------
+
+#' 1. get iris dataset (the most famouse dataset ever, create by Ronald Fisher
+#'    in 1936, it is constantly used to learn statistics, particularly,
+#'    statistical classification and cluter analysis)
+#'    So, grab the dataset and store it in a dataset called df
+#'    (hint you can find it in datasets::iris)
+df <- datasets::iris
+
+#' 2.  convert it in a data.table and store it in a variable called dt
+dt <- data.table(df)
+
+#' 3.  change the name of the columns
+#'     they have to he in lower cases and, nouns have to be singular
+#'     and also replace dots by undeerscores
+#'     (hint, you can use three functions names, colnames or setnames)
+#'
+new_names <- c('sepal_length','sepal_width','petal_length','petal_width','specie')
+# this way is ok
+colnames(dt) <- new_names
+# but this on is better
+colnames(dt) <- colnames(df) # just to learn a better way to change names
+setnames(dt,old=colnames(dt),new=new_names)
+
+#' 4 filter rows
+#' Filter the data.table subseting rows where specie is setosa
+#' (hint, use stackoverflow.com)
+
+# data.frame syntax
+dt[dt$specie == 'setosa']
+
+# use subset function
+subset(dt,subset = dt$specie == 'setosa')
+
+# dplyr syntax (using filter funcion)
+filter(dt,specie == 'setosa')
+
+# data.table syntax (the easiest, best and most efficient)
+dt[specie == 'setosa']
+
+
+#' 5 filter rows and columns
+#' Filter the data.table subseting rows where specie is setosa
+#' and select sepal_length and petal_length columns
+# (hint, use stackoverflow.com)
+
+# data.frame syntax
+dt[dt$specie == 'setosa',c('sepal_length','petal_length')]
+
+# using sybset function
+subset(dt,subset = dt$specie == 'setosa',
+       select = c('sepal_length','petal_length'))
+
+# dplyr syntax
+filter(dt,specie == 'setosa') %>% select(c('sepal_length','petal_length'))
+
+# data.table syntax
+dt[specie == 'setosa',c('sepal_length','petal_length')]
+
+
+
 
 

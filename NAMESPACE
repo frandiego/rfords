@@ -1,2 +1,4 @@
 exportPattern("^[[:alpha:]]+")
 import(purrr)
+import(data.table)
+
