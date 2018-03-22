@@ -1,4 +1,6 @@
-
+# CLEAN THE ENVIRONMENT AND COLLECT THE GARBAGE
+rm(list = ls())
+gc()
 
 
 # MISE EN PLACE ----------------------------------------------------------------
