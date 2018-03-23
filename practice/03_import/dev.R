@@ -21,8 +21,8 @@ setwd(pth_wd)
 
 # DOWNLOADING MOVIELENS DATASET -------------------------------------------
 url <- "http://files.grouplens.org/datasets/movielens/"
-dataset_small <- "ml-latest-small"
-dataset_full <- "ml-latest"
+dataset_small <- "dts_movielens_small"
+dataset_full <- "dts_movielens"
 data_folder <- "data"
 archive_type <- ".zip"
 
